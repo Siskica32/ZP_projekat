@@ -28,7 +28,7 @@ public class StartClass extends Application {
         
         Scene scene = new Scene(root, 300, 250);
         
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("Da li sam uspela da se popnem na granu?!");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
