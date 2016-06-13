@@ -76,6 +76,7 @@ public class User {
             FileOutputStream output = new FileOutputStream(file);
             keyStore.store(output, password.toCharArray());
             output.close();
+           
             return true;
         } catch (Exception ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
