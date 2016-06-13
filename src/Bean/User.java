@@ -75,8 +75,7 @@ public class User {
                 file.delete();
             FileOutputStream output = new FileOutputStream(file);
             keyStore.store(output, password.toCharArray());
-            output.close();
-           
+            output.close(); 
             return true;
         } catch (Exception ex) {
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
