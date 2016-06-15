@@ -1,5 +1,7 @@
 package Bean;
 
+import Security.FileUtil;
+import Security.Generator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,12 +15,30 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class User {
     
+    private ArrayList<CertificateWrapper> keys;
+    
+    public User(){
+        keys = new ArrayList<>();
+    }
+    
+    public void addKey(CertificateWrapper cw){
+        keys.add(cw);
+    }
+    
+    public CertificateWrapper getKey(int index){
+        return keys.get(index);
+    }
+    
+    
+    
+    /*
     private KeyStore keyStore;
     
     public User(){
@@ -95,4 +115,6 @@ public class User {
         return false;
     }
     
+
+*/
 }
