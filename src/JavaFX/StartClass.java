@@ -33,6 +33,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
@@ -98,13 +100,22 @@ public class StartClass extends Application {
         MenuItem csrMenuItem = new MenuItem("CSR");
         MenuItem signMenuItem = new MenuItem("Sign");
         MenuItem generateCertMenuItem = new MenuItem("Generate");
-        
+
         generateCertMenuItem.setOnAction(actionEvent -> {
             if (selektovani == null) {
-
-            } else if (selektovani.getCertificate() == null) { 
-            
-            }else {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText("You have to select keypair first!");
+                alert.showAndWait();
+            } else if (selektovani.getCertificate() == null) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText("You have to sign certificate first!");
+                alert.showAndWait();
+            } else {
+                fileUtil = new FileUtil();
                 FileChooser fileChooser = new FileChooser();
 
                 //Set extension filter
@@ -121,7 +132,11 @@ public class StartClass extends Application {
         });
         signMenuItem.setOnAction(actionEvent -> {
             if (selektovani == null) {
-
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText("You have to select keypair first!");
+                alert.showAndWait();
             } else {
                 Generator gen = new Generator();
                 X509Certificate cert = gen.generateCertificate(selektovani);
@@ -204,14 +219,10 @@ public class StartClass extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    
-  
 
     public void generateKeys(Stage primaryStage) {
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root, 1340, 600, Color.WHITE);
-
-     
 
         Label keySize = new Label("Key Size");
         TextField keySizeText = new TextField();
@@ -611,62 +622,61 @@ public class StartClass extends Application {
             @Override
             public void handle(ActionEvent event) {
                 //generisanje kljuca
-                try{
+                try {
                     CertificateWrapper cw = new CertificateWrapper();
                     Generator gen = new Generator();
 
                     KeyPair keyPair = gen.generateKeyPair(Integer.parseInt(keySizeText.getText()));
                     cw.setKeyPair(keyPair);
                     cw.setKeySize(Integer.parseInt(keySizeText.getText()));
-                    
+
                     LocalDate localDate = startDatePicker.getValue();
-                    Calendar calendar =  Calendar.getInstance();
-                    calendar.set(localDate.getYear(), localDate.getMonthValue()-1, localDate.getDayOfMonth());
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(localDate.getYear(), localDate.getMonthValue() - 1, localDate.getDayOfMonth());
                     cw.setStartDate(new Date(calendar.getTimeInMillis()));
-                    
+
                     localDate = expiryDatePicker.getValue();
-                    calendar.set(localDate.getYear(), localDate.getMonthValue()-1, localDate.getDayOfMonth());
+                    calendar.set(localDate.getYear(), localDate.getMonthValue() - 1, localDate.getDayOfMonth());
                     cw.setExpiryDate(new Date(calendar.getTimeInMillis()));
-                    
+
                     cw.setSerialNumber(BigInteger.valueOf(Long.parseLong(serialNumberText.getText())));
-                    cw.setCn(countryNameText.getText());
+                    cw.setCn(commonNameText.getText());
                     cw.setOu(organizationNameText.getText());
                     cw.setO(organizationNameText.getText());
                     cw.setL(localityNameText.getText());
                     cw.setSt(stateNameText.getText());
                     cw.setC(countryNameText.getText());
-                    
+
                     //basic constratint
-                    if(bce.isSelected()){
+                    if (bce.isSelected()) {
                         cw.setBasicConstraint(ica.isSelected());
                         cw.setBasicConstraintIsCritical(bceic.isSelected());
                         cw.setBasicConstraintPath(Integer.parseInt(pathDepthText.getText()));
-                    }else{
+                    } else {
                         cw.setBasicConstraint(null);
                     }
-                    
+
                     //alternative name
-                    if(ain.isSelected()){
+                    if (ain.isSelected()) {
                         cw.setAlternativeName(alternativeNamesText.getText());
                         cw.setAlternativeNameIsCritical(ainic.isSelected());
-                    }else{
+                    } else {
                         cw.setAlternativeName(null);
                     }
-                    
+
                     //key usage
-                    if(ku.isSelected()){
+                    if (ku.isSelected()) {
                         cw.setKeyUsageIsCritical(kuic.isSelected());
                         cw.calculateKeyUsage(ds.isSelected(), nr.isSelected(), ke.isSelected(), de.isSelected(), ka.isSelected(), kcs.isSelected(), cs.isSelected(), eo.isSelected(), decO.isSelected());
-                    }else{
+                    } else {
                         cw.setKeyUsageIsCritical(null);
                     }
-                    
+
                     cw.setIsSign(false);
-                    
+
                     keys.add(cw);
                     pocetna(primaryStage);
-                }
-                catch(Exception e){
+                } catch (Exception e) {
                     Logger.getLogger(Generator.class.getName()).log(Level.SEVERE, null, e);
                 }
             }
