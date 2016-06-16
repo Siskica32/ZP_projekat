@@ -6,7 +6,11 @@
 package JavaFX;
 
 import Bean.CertificateWrapper;
+import Security.FileUtil;
 import Security.Generator;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.sql.Date;
@@ -49,6 +53,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -60,8 +65,9 @@ import javafx.util.StringConverter;
 public class StartClass extends Application {
 
     GridPane stranica = new GridPane();
-    public CertificateWrapper selektovani;
+    public CertificateWrapper selektovani = null;
     private final String pattern = "yyyy-MM-dd";
+    public FileUtil fileUtil;
     private ArrayList<CertificateWrapper> keys;
 
     @Override
@@ -90,6 +96,25 @@ public class StartClass extends Application {
         MenuItem csrMenuItem = new MenuItem("CSR");
         MenuItem signMenuItem = new MenuItem("Sign");
         MenuItem generateCertMenuItem = new MenuItem("Generate");
+        
+        generateCertMenuItem.setOnAction(actionEvent -> {
+            if (selektovani == null) {
+
+            } else {
+                FileChooser fileChooser = new FileChooser();
+
+                //Set extension filter
+                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("CER files (*.cer)", "*.cer");
+                fileChooser.getExtensionFilters().add(extFilter);
+
+                //Show save file dialog
+                File file = fileChooser.showSaveDialog(primaryStage);
+
+                if (file != null) {
+                    fileUtil.exportCertificate(selektovani.getCertificate(), file.getPath());
+                }
+            }
+        });
         certMenu.getItems().addAll(csrMenuItem, signMenuItem, generateCertMenuItem);
         menuBar.getMenus().addAll(keyMenu, certMenu);
 
@@ -175,6 +200,8 @@ public class StartClass extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+    
+  
 
     public void generateKeys(Stage primaryStage) {
         BorderPane root = new BorderPane();
