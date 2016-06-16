@@ -118,14 +118,21 @@ public class FileUtil {
             if(cw.getBasicConstraintPath() >0) cw.setBasicConstraint(Boolean.TRUE);
             else cw.setBasicConstraint(Boolean.FALSE);
             
-            //alternative name & key usage
+            //alternative name
             Collection<List<?>> col = x509cert.getIssuerAlternativeNames();
             Iterator i = col.iterator();
-           // while(i.hasNext()){
-           //     System.out.print(".");
-           // }
+            while(i.hasNext()){
+                List<String> list = (List)i.next();
+                cw.setAlternativeName(list.get(1));
+            }
 
-
+            //key usage
+            boolean usage[] = x509cert.getKeyUsage();
+            if(usage != null){
+                if(usage.length >8){
+                    cw.calculateKeyUsage(usage[0], usage[1], usage[2], usage[3], usage[4], usage[5], usage[6], usage[7], usage[8]);
+                }
+            }
             
             return cw;
         } catch (Exception ex) {

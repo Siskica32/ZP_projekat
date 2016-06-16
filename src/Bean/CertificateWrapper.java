@@ -10,6 +10,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javafx.beans.property.SimpleStringProperty;
+import org.bouncycastle.asn1.x509.KeyUsage;
 
 public class CertificateWrapper {
     
@@ -88,6 +89,24 @@ public class CertificateWrapper {
         isSignString = new SimpleStringProperty();
         
         this.keyPair = keyPair;
+    }
+    
+    public void calculateKeyUsage(boolean k0, boolean k1, boolean k2, boolean k3, boolean k4, boolean k5, boolean k6, boolean k7, boolean k8){
+        int i0 = k0 == true? KeyUsage.digitalSignature: 0;
+        int i1 = k1 == true? KeyUsage.nonRepudiation: 0;
+        int i2 = k2 == true? KeyUsage.keyEncipherment: 0;
+        int i3 = k3 == true? KeyUsage.dataEncipherment: 0;
+        int i4 = k4 == true? KeyUsage.keyAgreement: 0;
+        int i5 = k5 == true? KeyUsage.keyCertSign: 0;
+        int i6 = k6 == true? KeyUsage.cRLSign: 0;
+        int i7 = k7 == true? KeyUsage.encipherOnly: 0;
+        int i8 = k8 == true? KeyUsage.decipherOnly: 0;
+        
+        keyUsage = i0 | i1 | i2 | i3 | i4 | i5 | i6 | i7 | i7;
+    }
+    
+    public void calculateKeyUsageString(){
+        
     }
 
     public KeyPair getKeyPair() {

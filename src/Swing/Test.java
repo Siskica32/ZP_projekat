@@ -29,14 +29,16 @@ public class Test {
         cw.setOu("af");
         cw.setSt("asfd");
         cw.setC("f");
-        cw.setAlternativeName("dns");
+        cw.setAlternativeName("dns sam ja");
         cw.setAlternativeNameIsCritical(Boolean.TRUE);
+        cw.setKeyUsage(3);
+        cw.setKeyUsageIsCritical(Boolean.TRUE);
         cw.setIsSign(true);
         
         Certificate c = gen.generateCertificate(cw);
         cw.setCertificate(c);
         //fu.exportCertificate(c, "C://Users//Admin//Desktop//cert.cer");
-       // fu.exportKeyStore("C://Users//Admin//Desktop//s.bin", "pass", cw);
+        fu.exportKeyStore("C://Users//Admin//Desktop//s.bin", "pass", cw);
        
         
         fu.importKeyStore("C://Users//Admin//Desktop//s.bin", "pass");
