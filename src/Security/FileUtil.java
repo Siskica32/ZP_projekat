@@ -8,17 +8,22 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 import org.bouncycastle.asn1.x500.RDN;
@@ -69,9 +74,65 @@ public class FileUtil {
             keyStore.store(output, password.toCharArray());  
             output.close();
             
+            aesEncrypt(file, password);
+            
         } catch (Exception ex) {
             Logger.getLogger(FileUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public void aesEncrypt(File file, String password){
+        try{
+            
+            FileInputStream input = new FileInputStream(file);
+            byte[] content = new byte[(int)file.length()];
+            input.read(content);
+            
+            MessageDigest sha = MessageDigest.getInstance("SHA-1"); 
+            byte[] key =  password.getBytes("UTF-8");
+            key = Arrays.copyOf(sha.digest(key), 16);
+            SecretKey secretKey = new SecretKeySpec(key,"AES");
+            
+            Cipher aes = Cipher.getInstance("AES");
+            aes.init(Cipher.ENCRYPT_MODE, secretKey);
+            byte[] encodedText = aes.doFinal(content);
+            
+            input.close();
+            
+            FileOutputStream output = new FileOutputStream(file);
+            output.write(encodedText);
+            output.close();
+            
+        }catch (Exception ex) {
+            Logger.getLogger(FileUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void aesDecrypt(File file, String password){ 
+        try{
+            
+            FileInputStream input = new FileInputStream(file);
+            byte[] content = new byte[(int)file.length()];
+            input.read(content);
+            
+            MessageDigest sha = MessageDigest.getInstance("SHA-1"); 
+            byte[] key =  password.getBytes("UTF-8");
+            key = Arrays.copyOf(sha.digest(key), 16);
+            SecretKey secretKey = new SecretKeySpec(key,"AES");
+            
+            Cipher aes = Cipher.getInstance("AES");
+            aes.init(Cipher.DECRYPT_MODE, secretKey);
+            byte[] encodedText = aes.doFinal(content);
+            
+            input.close();
+            
+            FileOutputStream output = new FileOutputStream(file);
+            output.write(encodedText);
+            output.close();
+            
+        }catch (Exception ex) {
+            Logger.getLogger(FileUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }  
     }
 
     public CertificateWrapper importKeyStore(String path, String password) {
@@ -79,6 +140,8 @@ public class FileUtil {
             File file = new File(path);
             if (!file.exists()) 
                 return null;
+            
+            aesDecrypt(file,password);
             
             KeyStore keyStore = KeyStore.getInstance("pkcs12");
             FileInputStream input = new FileInputStream(path);

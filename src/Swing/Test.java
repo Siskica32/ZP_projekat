@@ -41,8 +41,8 @@ public class Test {
         fu.exportKeyStore("C://Users//Admin//Desktop//s.bin", "pass", cw);
        
         
-        fu.importKeyStore("C://Users//Admin//Desktop//s.bin", "pass");
-        
+        CertificateWrapper cw1 = fu.importKeyStore("C://Users//Admin//Desktop//s.bin", "pass");
+        System.out.println(cw1.getCn());
         
         
         
