@@ -28,10 +28,17 @@ import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.BufferingContentSigner;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.encoders.Base64Encoder;
 
 public class FileUtil {
@@ -78,6 +85,39 @@ public class FileUtil {
             
         } catch (Exception ex) {
             Logger.getLogger(FileUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void exportCSR(CertificateWrapper cw, String path) {
+        Generator gen = new Generator();
+        try {
+            File file = new File(path);
+            if (file.exists()) {
+                file.delete();
+            }
+            //Formiranje imena
+            X500NameBuilder nameBuilder = new X500NameBuilder(BCStyle.INSTANCE);
+            nameBuilder.addRDN(BCStyle.CN, cw.getCn());
+            nameBuilder.addRDN(BCStyle.OU, cw.getOu());
+            nameBuilder.addRDN(BCStyle.O, cw.getO());
+            nameBuilder.addRDN(BCStyle.L, cw.getL());
+            nameBuilder.addRDN(BCStyle.ST, cw.getSt());
+            nameBuilder.addRDN(BCStyle.C, cw.getC());
+
+            PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(nameBuilder.build(), cw.getPublicKey());
+            JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA1withRSA");
+            ContentSigner signer = csBuilder.build(cw.getPrivateKey());
+            PKCS10CertificationRequest csr = p10Builder.build(signer);
+            ContentSigner sigGen = new BufferingContentSigner(signer);
+
+            byte[] buffer = sigGen.getSignature();
+
+            FileOutputStream output = new FileOutputStream(file);
+            Base64Encoder encoder = new Base64Encoder();
+            encoder.encode(buffer, 0, buffer.length, output);
+            output.close();
+        } catch (Exception ex) {
+            Logger.getLogger(Generator.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

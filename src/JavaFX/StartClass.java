@@ -20,6 +20,7 @@ import java.time.chrono.HijrahChronology;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -32,24 +33,30 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
@@ -59,6 +66,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.Pair;
 import javafx.util.StringConverter;
 
 /**
@@ -73,6 +81,14 @@ public class StartClass extends Application {
     private final String pattern = "yyyy-MM-dd";
     public FileUtil fileUtil;
     private ArrayList<CertificateWrapper> keys;
+
+    public Label keyUsage = new Label("Key Usage?");
+    public CheckBox ku = new CheckBox();
+
+    public Label keyUSageIsCritical = new Label("Is Key Usage Critical?");
+    public CheckBox kuic = new CheckBox();
+    
+    public String password;
 
     @Override
     public void start(Stage primaryStage) {
@@ -95,11 +111,102 @@ public class StartClass extends Application {
         generateMenuItem.setOnAction(actionEvent -> {
             generateKeys(primaryStage);
         });
+        exportMenuItem.setOnAction(actionEvent -> {
+            if (selektovani == null) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText("You have to select keypair first!");
+                alert.showAndWait();
+            } else {
+                Dialog<String> dialog = new Dialog<>();
+                dialog.setTitle("Type password");
+
+                ButtonType next = new ButtonType("Next", ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(next, ButtonType.CANCEL);
+
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+
+                PasswordField pass = new PasswordField();
+                pass.setPromptText("Password");
+
+                grid.add(new Label("Password:"), 0, 1);
+                grid.add(pass, 1, 1);
+
+                Node nextButton = dialog.getDialogPane().lookupButton(next);
+                nextButton.setDisable(true);
+
+                pass.textProperty().addListener((observable, oldValue, newValue) -> {
+                    nextButton.setDisable(newValue.trim().isEmpty());
+                });
+
+                dialog.getDialogPane().setContent(grid);
+
+                Platform.runLater(() -> pass.requestFocus());
+
+                dialog.setResultConverter(dialogButton -> {
+                    if (dialogButton == next) {
+                        password = pass.getText();
+                        return pass.getText();
+                    }
+                    return null;
+                });
+
+                Optional<String> result = dialog.showAndWait();
+
+                result.ifPresent(usernamePassword -> {
+                    
+                    fileUtil = new FileUtil();
+                    FileChooser fileChooser = new FileChooser();
+
+                    //Set extension filter
+                    FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("P12 files (*.p12)", "*.p12");
+                    fileChooser.getExtensionFilters().add(extFilter);
+
+                    //Show save file dialog
+                    File file = fileChooser.showSaveDialog(primaryStage);
+
+                    if (file != null) {
+                        fileUtil.exportKeyStore(file.getPath(), password, selektovani);
+                    }
+
+                });
+
+            }
+        });
+
         keyMenu.getItems().addAll(generateMenuItem, importMenuItem, exportMenuItem);
         Menu certMenu = new Menu("Certificate");
         MenuItem csrMenuItem = new MenuItem("CSR");
         MenuItem signMenuItem = new MenuItem("Sign");
         MenuItem generateCertMenuItem = new MenuItem("Generate");
+
+        csrMenuItem.setOnAction(actionEvent -> {
+            if (selektovani == null) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText("You have to select keypair first!");
+                alert.showAndWait();
+            } else {
+                fileUtil = new FileUtil();
+                FileChooser fileChooser = new FileChooser();
+
+                //Set extension filter
+                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("P10 files (*.p10)", "*.p10");
+                fileChooser.getExtensionFilters().add(extFilter);
+
+                //Show save file dialog
+                File file = fileChooser.showSaveDialog(primaryStage);
+
+                if (file != null) {
+                    fileUtil.exportCSR(selektovani, file.getPath());
+                }
+            }
+        });
 
         generateCertMenuItem.setOnAction(actionEvent -> {
             if (selektovani == null) {
@@ -137,6 +244,12 @@ public class StartClass extends Application {
                 alert.setHeaderText(null);
                 alert.setContentText("You have to select keypair first!");
                 alert.showAndWait();
+            } else if (selektovani.isIsSign()) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText("Certificate is already signed!");
+                alert.showAndWait();
             } else {
                 Generator gen = new Generator();
                 X509Certificate cert = gen.generateCertificate(selektovani);
@@ -147,6 +260,7 @@ public class StartClass extends Application {
                 pocetna(primaryStage);
             }
         });
+
         certMenu.getItems().addAll(csrMenuItem, signMenuItem, generateCertMenuItem);
         menuBar.getMenus().addAll(keyMenu, certMenu);
 
@@ -355,8 +469,10 @@ public class StartClass extends Application {
 
         basicConstraintExtensionIsCritical.setDisable(true);
         bceic.setDisable(true);
+        bceic.setSelected(false);
         isItCA.setDisable(true);
         ica.setDisable(true);
+        ica.setSelected(false);
         pathDepth.setDisable(true);
         pathDepthText.setDisable(true);
         pathDepthText.setText("1");
@@ -396,8 +512,10 @@ public class StartClass extends Application {
 
         alternativeIssuerNamesIsCritical.setDisable(true);
         ainic.setDisable(true);
+        ainic.setSelected(false);
         alternativeNames.setDisable(true);
         alternativeNamesText.setDisable(true);
+        alternativeNamesText.setText("");
 
         ain.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -443,26 +561,37 @@ public class StartClass extends Application {
         Label decipherOnly = new Label("Decipher Only?");
         CheckBox decO = new CheckBox();
 
+        ku.setSelected(false);
         keyUSageIsCritical.setDisable(true);
         kuic.setDisable(true);
+        kuic.setSelected(false);
         digitalSignature.setDisable(true);
         ds.setDisable(true);
+        ds.setSelected(false);
         dataEncipherment.setDisable(true);
         de.setDisable(true);
+        de.setSelected(false);
         crlSignature.setDisable(true);
         cs.setDisable(true);
+        cs.setSelected(false);
         nonRepudiation.setDisable(true);
         nr.setDisable(true);
+        nr.setSelected(false);
         keyAgreement.setDisable(true);
         ka.setDisable(true);
+        ka.setSelected(false);
         encipherOnly.setDisable(true);
         eo.setDisable(true);
+        eo.setSelected(false);
         keyEncipherment.setDisable(true);
         ke.setDisable(true);
+        ke.setSelected(false);
         keyCertificateSignature.setDisable(true);
         kcs.setDisable(true);
+        kcs.setSelected(false);
         decipherOnly.setDisable(true);
         decO.setDisable(true);
+        decO.setSelected(false);
 
         ku.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -520,6 +649,7 @@ public class StartClass extends Application {
                     decO.setDisable(true);
                     decO.setSelected(false);
                 }
+
             }
         });
 
@@ -675,6 +805,51 @@ public class StartClass extends Application {
                     cw.setIsSign(false);
 
                     keys.add(cw);
+                    keyUSageIsCritical.setDisable(true);
+                    kuic.setDisable(true);
+                    kuic.setSelected(false);
+                    digitalSignature.setDisable(true);
+                    ds.setDisable(true);
+                    ds.setSelected(false);
+                    dataEncipherment.setDisable(true);
+                    de.setDisable(true);
+                    de.setSelected(false);
+                    crlSignature.setDisable(true);
+                    cs.setDisable(true);
+                    cs.setSelected(false);
+                    nonRepudiation.setDisable(true);
+                    nr.setDisable(true);
+                    nr.setSelected(false);
+                    keyAgreement.setDisable(true);
+                    ka.setDisable(true);
+                    ka.setSelected(false);
+                    encipherOnly.setDisable(true);
+                    eo.setDisable(true);
+                    eo.setSelected(false);
+                    keyEncipherment.setDisable(true);
+                    ke.setDisable(true);
+                    ke.setSelected(false);
+                    keyCertificateSignature.setDisable(true);
+                    kcs.setDisable(true);
+                    kcs.setSelected(false);
+                    decipherOnly.setDisable(true);
+                    decO.setDisable(true);
+                    decO.setSelected(false);
+                    alternativeIssuerNamesIsCritical.setDisable(true);
+                    ainic.setDisable(true);
+                    ainic.setSelected(false);
+                    alternativeNames.setDisable(true);
+                    alternativeNamesText.setDisable(true);
+                    alternativeNamesText.setText("");
+                    basicConstraintExtensionIsCritical.setDisable(true);
+                    bceic.setDisable(true);
+                    bceic.setSelected(false);
+                    isItCA.setDisable(true);
+                    ica.setDisable(true);
+                    ica.setSelected(false);
+                    pathDepth.setDisable(true);
+                    pathDepthText.setDisable(true);
+                    pathDepthText.setText("1");
                     pocetna(primaryStage);
                 } catch (Exception e) {
                     Logger.getLogger(Generator.class.getName()).log(Level.SEVERE, null, e);

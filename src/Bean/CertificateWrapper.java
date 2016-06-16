@@ -102,7 +102,8 @@ public class CertificateWrapper {
         int i7 = k7 == true ? KeyUsage.encipherOnly : 0;
         int i8 = k8 == true ? KeyUsage.decipherOnly : 0;
 
-        keyUsage = i0 | i1 | i2 | i3 | i4 | i5 | i6 | i7 | i7;
+        keyUsage = i0 | i1 | i2 | i3 | i4 | i5 | i6 | i7 | i8;
+        setKeyUsageString(keyUsage + "");
     }
 
     public void calculateKeyUsageString() {
@@ -308,7 +309,7 @@ public class CertificateWrapper {
     }
 
     public void setKeySizeString(String keySizeString) {
-        this.keySizeString.set(keySizeString);;
+        this.keySizeString.set(keySizeString);
     }
 
     public String getStartDateString() {
