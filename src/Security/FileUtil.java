@@ -15,6 +15,8 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -109,6 +111,12 @@ public class FileUtil {
             cw.setStartDate(x509cert.getNotBefore());
             cw.setExpiryDate(x509cert.getNotAfter());
             cw.setSerialNumber(cw.getSerialNumber());
+            cw.setBasicConstraintPath(x509cert.getBasicConstraints());
+            if(cw.getBasicConstraintPath() >0) cw.setBasicConstraint(Boolean.TRUE);
+            else cw.setBasicConstraint(Boolean.FALSE);
+            
+            //alternative name & key usage
+
 
             
             return cw;
