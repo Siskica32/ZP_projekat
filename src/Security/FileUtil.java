@@ -218,7 +218,7 @@ public class FileUtil {
             
             cw.setStartDate(x509cert.getNotBefore());
             cw.setExpiryDate(x509cert.getNotAfter());
-            cw.setSerialNumber(cw.getSerialNumber());
+            cw.setSerialNumber(x509cert.getSerialNumber());
             cw.setBasicConstraintPath(x509cert.getBasicConstraints());
             if(cw.getBasicConstraintPath() >0) cw.setBasicConstraint(Boolean.TRUE);
             else cw.setBasicConstraint(Boolean.FALSE);
@@ -240,6 +240,8 @@ public class FileUtil {
                     cw.calculateKeyUsage(usage[0], usage[1], usage[2], usage[3], usage[4], usage[5], usage[6], usage[7], usage[8]);
                 }
             }
+            
+            cw.setIsSign(true);
             
             return cw;
         } catch (Exception ex) {

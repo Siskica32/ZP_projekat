@@ -38,10 +38,10 @@ public class Test {
         Certificate c = gen.generateCertificate(cw);
         cw.setCertificate(c);
         //fu.exportCertificate(c, "C://Users//Admin//Desktop//cert.cer");
-        fu.exportKeyStore("C://Users//Admin//Desktop//s.bin", "pass", cw);
+        //fu.exportKeyStore("C://Users//Admin//Desktop//s.bin", "pass", cw);
        
         
-        CertificateWrapper cw1 = fu.importKeyStore("C://Users//Admin//Desktop//s.bin", "pass");
+        CertificateWrapper cw1 = fu.importKeyStore("C://Users//Admin//Desktop//test.p12", "misa");
         System.out.println(cw1.getCn());
         
         
