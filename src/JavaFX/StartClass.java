@@ -62,7 +62,7 @@ public class StartClass extends Application {
 
     public void pocetna(Stage primaryStage) {
         BorderPane root = new BorderPane();
-        Scene scene = new Scene(root, 1300, 600, Color.WHITE);
+        Scene scene = new Scene(root, 1340, 600, Color.WHITE);
 
         //menuBar
         MenuBar menuBar = new MenuBar();
@@ -168,7 +168,7 @@ public class StartClass extends Application {
 
     public void generateKeys(Stage primaryStage) {
         BorderPane root = new BorderPane();
-        Scene scene = new Scene(root, 1300, 600, Color.WHITE);
+        Scene scene = new Scene(root, 1340, 600, Color.WHITE);
 
         MenuBar menuBar = new MenuBar();
         menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
