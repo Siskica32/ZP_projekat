@@ -241,6 +241,7 @@ public class FileUtil {
                 }
             }
             
+            cw.setCertificate(certificate);
             cw.setIsSign(true);
             
             return cw;
