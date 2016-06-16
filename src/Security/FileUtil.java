@@ -13,6 +13,7 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -95,6 +96,7 @@ public class FileUtil {
             X509Certificate x509cert = (X509Certificate) certificateFactory.generateCertificate(in);
       
             CertificateWrapper cw = new CertificateWrapper(keyPair);
+            cw.setKeySize(((RSAPublicKey)publicKey).getModulus().bitLength());
             
             X500Name x500name = new JcaX509CertificateHolder(x509cert).getSubject();
             RDN cn = x500name.getRDNs(BCStyle.CN)[0];
