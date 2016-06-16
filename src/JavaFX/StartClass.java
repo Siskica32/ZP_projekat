@@ -169,8 +169,16 @@ public class StartClass extends Application {
 
                 result.ifPresent(usernamePassword -> {
                     CertificateWrapper cw = fileUtil.importKeyStore(file.getPath(), password);
-                    keys.add(cw);
-                    pocetna(primaryStage);
+                    if (cw != null) {
+                        keys.add(cw);
+                        pocetna(primaryStage);
+                    } else {
+                        Alert alert = new Alert(AlertType.INFORMATION);
+                        alert.setTitle("Information Dialog");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Wrong password!");
+                        alert.showAndWait();
+                    }
                 });
             }
 
