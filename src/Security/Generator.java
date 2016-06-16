@@ -24,6 +24,8 @@ import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -86,8 +88,10 @@ public class Generator {
             
             //Dodavanje issuer alternative name polja (ako je zadato)
             if(cw.getAlternativeName() != null){
-                X500Name an = new X500Name(cw.getAlternativeName());
-                Extension anExtension = new Extension(Extension.issuerAlternativeName, cw.getAlternativeNameIsCritical(), an.getEncoded());
+                //X500Name an = new X500Name(cw.getAlternativeName());
+                GeneralName anName = new GeneralName(GeneralName.dNSName, cw.getAlternativeName());
+                GeneralNames anNames = new GeneralNames(anName);
+                Extension anExtension = new Extension(Extension.issuerAlternativeName, cw.getAlternativeNameIsCritical(), anNames.getEncoded());
                 builder.addExtension(anExtension);
             }
             

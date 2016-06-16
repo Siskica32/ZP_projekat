@@ -13,6 +13,9 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.ldap.LdapName;
@@ -102,11 +105,11 @@ public class FileUtil {
             RDN c = x500name.getRDNs(BCStyle.C)[0];
             
             cw.setCn(IETFUtils.valueToString(cn.getFirst().getValue()));
-            cw.setCn(IETFUtils.valueToString(ou.getFirst().getValue()));
-            cw.setCn(IETFUtils.valueToString(o.getFirst().getValue()));
-            cw.setCn(IETFUtils.valueToString(l.getFirst().getValue()));
-            cw.setCn(IETFUtils.valueToString(st.getFirst().getValue()));
-            cw.setCn(IETFUtils.valueToString(c.getFirst().getValue()));
+            cw.setOu(IETFUtils.valueToString(ou.getFirst().getValue()));
+            cw.setO(IETFUtils.valueToString(o.getFirst().getValue()));
+            cw.setL(IETFUtils.valueToString(l.getFirst().getValue()));
+            cw.setSt(IETFUtils.valueToString(st.getFirst().getValue()));
+            cw.setC(IETFUtils.valueToString(c.getFirst().getValue()));
             
             cw.setStartDate(x509cert.getNotBefore());
             cw.setExpiryDate(x509cert.getNotAfter());
@@ -116,6 +119,11 @@ public class FileUtil {
             else cw.setBasicConstraint(Boolean.FALSE);
             
             //alternative name & key usage
+            Collection<List<?>> col = x509cert.getIssuerAlternativeNames();
+            Iterator i = col.iterator();
+           // while(i.hasNext()){
+           //     System.out.print(".");
+           // }
 
 
             

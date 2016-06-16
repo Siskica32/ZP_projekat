@@ -71,7 +71,22 @@ public class CertificateWrapper {
     }
 
     public CertificateWrapper(KeyPair keyPair) {
-        super();
+        keySizeString = new SimpleStringProperty();
+        startDateString = new SimpleStringProperty();
+        expiryDateString = new SimpleStringProperty();
+        serialNumberString = new SimpleStringProperty();
+        cnString = new SimpleStringProperty();
+        ouString = new SimpleStringProperty();
+        oString = new SimpleStringProperty();
+        lString = new SimpleStringProperty();
+        stString = new SimpleStringProperty();
+        cString = new SimpleStringProperty();
+        basicConstraintString = new SimpleStringProperty();
+        basicConstraintPathString = new SimpleStringProperty();
+        keyUsageString = new SimpleStringProperty();
+        alternativeNameString = new SimpleStringProperty();
+        isSignString = new SimpleStringProperty();
+        
         this.keyPair = keyPair;
     }
 
