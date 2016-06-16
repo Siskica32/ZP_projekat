@@ -66,6 +66,7 @@ public class StartClass extends Application {
 
     GridPane stranica = new GridPane();
     public CertificateWrapper selektovani = null;
+    public int selektovaniId;
     private final String pattern = "yyyy-MM-dd";
     public FileUtil fileUtil;
     private ArrayList<CertificateWrapper> keys;
@@ -169,22 +170,9 @@ public class StartClass extends Application {
         root.setCenter(table);
 
         ObservableList<CertificateWrapper> kljucevi = FXCollections.observableArrayList();
-        CertificateWrapper cw = new CertificateWrapper();
-        cw.setKeySizeString("1024");
-        cw.setStartDateString("2016-06-16");
-        cw.setExpiryDateString("2016-06-18");
-        cw.setSerialNumberString("123456");
-        cw.setCnString("Dragance");
-        cw.setOuString("Opatija");
-        cw.setOString("Opatija");
-        cw.setlString("Pakao");
-        cw.setStString("Beograd");
-        cw.setcString("Srbija");
-        cw.setBasicConstraintString("true");
-        cw.setAlternativeNameString("CN=");
-        cw.setKeyUsageString("1");
-        cw.setIsSignString("false");
-        kljucevi.add(cw);
+        for (int i = 0; i < keys.size(); i++) {
+            kljucevi.add(keys.get(i));
+        }
 
         table.setItems(kljucevi);
 
@@ -192,7 +180,7 @@ public class StartClass extends Application {
 
             if (table.getSelectionModel().getSelectedItem() != null) {
                 selektovani = (CertificateWrapper) table.getSelectionModel().getSelectedItem();
-
+                selektovaniId = table.getSelectionModel().getSelectedIndex();
             }
         });
 
@@ -207,26 +195,7 @@ public class StartClass extends Application {
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root, 1340, 600, Color.WHITE);
 
-        MenuBar menuBar = new MenuBar();
-        menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
-        root.setTop(menuBar);
-
-        // File menu - new, save, exit
-        Menu keyMenu = new Menu("Key");
-        MenuItem generateMenuItem = new MenuItem("Generate");
-        MenuItem importMenuItem = new MenuItem("Import");
-        MenuItem exportMenuItem = new MenuItem("Export");
-
-        keyMenu.getItems().addAll(generateMenuItem, importMenuItem, exportMenuItem);
-
-        Menu certMenu = new Menu("Certificate");
-        MenuItem csrMenuItem = new MenuItem("CSR");
-        MenuItem signMenuItem = new MenuItem("Sign");
-        MenuItem generateCertMenuItem = new MenuItem("Generate");
-
-        certMenu.getItems().addAll(csrMenuItem, signMenuItem, generateCertMenuItem);
-
-        menuBar.getMenus().addAll(keyMenu, certMenu);
+     
 
         Label keySize = new Label("Key Size");
         TextField keySizeText = new TextField();
