@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
+import java.security.cert.X509Certificate;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.chrono.HijrahChronology;
@@ -101,7 +102,9 @@ public class StartClass extends Application {
         generateCertMenuItem.setOnAction(actionEvent -> {
             if (selektovani == null) {
 
-            } else {
+            } else if (selektovani.getCertificate() == null) { 
+            
+            }else {
                 FileChooser fileChooser = new FileChooser();
 
                 //Set extension filter
@@ -114,6 +117,19 @@ public class StartClass extends Application {
                 if (file != null) {
                     fileUtil.exportCertificate(selektovani.getCertificate(), file.getPath());
                 }
+            }
+        });
+        signMenuItem.setOnAction(actionEvent -> {
+            if (selektovani == null) {
+
+            } else {
+                Generator gen = new Generator();
+                X509Certificate cert = gen.generateCertificate(selektovani);
+                selektovani.setCertificate(cert);
+                selektovani.setIsSign(true);
+                keys.get(selektovaniId).setCertificate(cert);
+                keys.get(selektovaniId).setIsSign(true);
+                pocetna(primaryStage);
             }
         });
         certMenu.getItems().addAll(csrMenuItem, signMenuItem, generateCertMenuItem);
