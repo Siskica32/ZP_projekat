@@ -225,12 +225,14 @@ public class FileUtil {
             
             //alternative name
             Collection<List<?>> col = x509cert.getIssuerAlternativeNames();
-            Iterator i = col.iterator();
-            while(i.hasNext()){
-                List<String> list = (List)i.next();
-                cw.setAlternativeName(list.get(1));
+            if(col != null){
+                Iterator i = col.iterator();
+                while(i.hasNext()){
+                    List<String> list = (List)i.next();
+                    cw.setAlternativeName(list.get(1));
+                }
             }
-
+            
             //key usage
             boolean usage[] = x509cert.getKeyUsage();
             if(usage != null){
