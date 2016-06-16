@@ -171,7 +171,7 @@ public class FileUtil {
             output.close();
             
         }catch (Exception ex) {
-            Logger.getLogger(FileUtil.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(FileUtil.class.getName()).log(Level.SEVERE, null, ex);
         }  
     }
 

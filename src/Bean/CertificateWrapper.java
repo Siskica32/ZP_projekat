@@ -101,9 +101,8 @@ public class CertificateWrapper {
         int i6 = k6 == true ? KeyUsage.cRLSign : 0;
         int i7 = k7 == true ? KeyUsage.encipherOnly : 0;
         int i8 = k8 == true ? KeyUsage.decipherOnly : 0;
-
-        keyUsage = i0 | i1 | i2 | i3 | i4 | i5 | i6 | i7 | i8;
-        setKeyUsageString(keyUsage + "");
+        
+        setKeyUsage(i0 | i1 | i2 | i3 | i4 | i5 | i6 | i7 | i8);
     }
 
     public void calculateKeyUsageString() {
@@ -413,7 +412,23 @@ public class CertificateWrapper {
     }
 
     public void setKeyUsageString(String keyUsageString) {
-        this.keyUsageString.set(keyUsageString);
+        try{
+
+            int usage = Integer.parseInt(keyUsageString);
+            String s = "";
+            if((usage & KeyUsage.digitalSignature) > 0) s += "[ Digital Signature ]";
+            if((usage & KeyUsage.nonRepudiation) > 0) s += "[ Non Repudiation ]";
+            if((usage & KeyUsage.keyEncipherment) > 0) s += "[ Key Encipherment ]";
+            if((usage & KeyUsage.dataEncipherment) > 0) s += "[ Data Encipherment ]";
+            if((usage & KeyUsage.keyAgreement) > 0) s += "[ Key Agreement ]";
+            if((usage & KeyUsage.keyCertSign) > 0) s += "[ key Certificate Signature ]";
+            if((usage & KeyUsage.cRLSign) > 0) s += "[ Crl Signature ]";
+            if((usage & KeyUsage.encipherOnly) > 0) s += "[ Encipher Only ]";
+            if((usage & KeyUsage.decipherOnly) > 0) s += "[ Decipher Only ]";
+            this.keyUsageString.set(s);
+             
+        }
+        catch(Exception e){}
     }
 
     public String getIsSignString() {
