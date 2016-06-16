@@ -8,6 +8,8 @@ package JavaFX;
 import Bean.CertificateWrapper;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
@@ -30,6 +32,7 @@ import javafx.stage.Stage;
 public class StartClass extends Application {
 
     BorderPane stranica = new BorderPane();
+    public CertificateWrapper selektovani;
 
     @Override
     public void start(Stage primaryStage) {
@@ -69,7 +72,7 @@ public class StartClass extends Application {
         TableColumn serialNumber = new TableColumn("Serial Number");
         serialNumber.setCellValueFactory(new PropertyValueFactory<CertificateWrapper, String>("serialNumberString"));
         
-        TableColumn commonName = new TableColumn("Comon Name");
+        TableColumn commonName = new TableColumn("Common Name");
         commonName.setCellValueFactory(new PropertyValueFactory<CertificateWrapper, String>("cnString"));
         
         TableColumn organizationUnitName = new TableColumn("Organization Unit Name");
@@ -105,6 +108,36 @@ public class StartClass extends Application {
         
         table.getColumns().addAll(keySize, startDate, expiryDate, serialNumber, commonName, organizationUnitName, organizationName, localityName, stateName, countryName, basicConstraint, keyUsage, isSign);
         root.setCenter(table);
+        
+        ObservableList<CertificateWrapper>  kljucevi = FXCollections.observableArrayList();
+        CertificateWrapper cw = new CertificateWrapper();
+        cw.setKeySizeString("1024");
+        cw.setStartDateString("2016-06-16");
+        cw.setExpiryDateString("2016-06-18");
+        cw.setSerialNumberString("123456");
+        cw.setCnString("Dragance");
+        cw.setOuString("Opatija");
+        cw.setOString("Opatija");
+        cw.setlString("Pakao");
+        cw.setStString("Beograd");
+        cw.setcString("Srbija");
+        cw.setBasicConstraintString("true");
+        cw.setAlternativeNameString("CN=");
+        cw.setKeyUsageString("1");
+        cw.setIsSignString("false");
+        kljucevi.add(cw);
+        
+        table.setItems(kljucevi);
+        
+         table.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+
+            if (table.getSelectionModel().getSelectedItem() != null) {
+                selektovani = (CertificateWrapper) table.getSelectionModel().getSelectedItem();
+                
+            }
+        });
+
+        
         
         primaryStage.setTitle("Welcome");
         primaryStage.setScene(scene);
