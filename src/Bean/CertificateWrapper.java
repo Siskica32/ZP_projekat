@@ -65,6 +65,7 @@ public class CertificateWrapper {
         cString = new SimpleStringProperty();
         basicConstraintString = new SimpleStringProperty();
         basicConstraintPathString = new SimpleStringProperty();
+        keyUsageString = new SimpleStringProperty();
         alternativeNameString = new SimpleStringProperty();
         isSignString = new SimpleStringProperty();
     }
@@ -159,7 +160,7 @@ public class CertificateWrapper {
     }
 
     public void setO(String o) {
-        setoString(o);
+        setOString(o);
         this.o = o;
     }
 
@@ -313,15 +314,15 @@ public class CertificateWrapper {
         this.ouString.set(ouString);
     }
 
-    public String getoString() {
+    public String getOString() {
         return oString.get();
     }
 
-    public void setoString(String oString) {
+    public void setOString(String oString) {
         this.oString.set(oString);
     }
 
-    public String getlString() {
+    public String getLString() {
         return lString.get();
     }
 
@@ -337,7 +338,7 @@ public class CertificateWrapper {
         this.stString.set(stString);
     }
 
-    public String getcString() {
+    public String getCString() {
         return cString.get();
     }
 
