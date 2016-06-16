@@ -6,9 +6,17 @@
 package JavaFX;
 
 import Bean.CertificateWrapper;
+import Security.Generator;
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.chrono.HijrahChronology;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -54,9 +62,11 @@ public class StartClass extends Application {
     GridPane stranica = new GridPane();
     public CertificateWrapper selektovani;
     private final String pattern = "yyyy-MM-dd";
+    private ArrayList<CertificateWrapper> keys;
 
     @Override
     public void start(Stage primaryStage) {
+        keys = new ArrayList<>();
         pocetna(primaryStage);
     }
 
@@ -589,6 +599,64 @@ public class StartClass extends Application {
             @Override
             public void handle(ActionEvent event) {
                 //generisanje kljuca
+                try{
+                    CertificateWrapper cw = new CertificateWrapper();
+                    Generator gen = new Generator();
+
+                    KeyPair keyPair = gen.generateKeyPair(Integer.parseInt(keySizeText.getText()));
+                    cw.setKeyPair(keyPair);
+                    cw.setKeySize(Integer.parseInt(keySizeText.getText()));
+                    
+                    LocalDate localDate = startDatePicker.getValue();
+                    Calendar calendar =  Calendar.getInstance();
+                    calendar.set(localDate.getYear(), localDate.getMonthValue()-1, localDate.getDayOfMonth());
+                    cw.setStartDate(new Date(calendar.getTimeInMillis()));
+                    
+                    localDate = expiryDatePicker.getValue();
+                    calendar.set(localDate.getYear(), localDate.getMonthValue()-1, localDate.getDayOfMonth());
+                    cw.setExpiryDate(new Date(calendar.getTimeInMillis()));
+                    
+                    cw.setSerialNumber(BigInteger.valueOf(Long.parseLong(serialNumberText.getText())));
+                    cw.setCn(countryNameText.getText());
+                    cw.setOu(organizationNameText.getText());
+                    cw.setO(organizationNameText.getText());
+                    cw.setL(localityNameText.getText());
+                    cw.setSt(stateNameText.getText());
+                    cw.setC(countryNameText.getText());
+                    
+                    //basic constratint
+                    if(bce.isSelected()){
+                        cw.setBasicConstraint(ica.isSelected());
+                        cw.setBasicConstraintIsCritical(bceic.isSelected());
+                        cw.setBasicConstraintPath(Integer.parseInt(pathDepthText.getText()));
+                    }else{
+                        cw.setBasicConstraint(null);
+                    }
+                    
+                    //alternative name
+                    if(ain.isSelected()){
+                        cw.setAlternativeName(alternativeNamesText.getText());
+                        cw.setAlternativeNameIsCritical(ainic.isSelected());
+                    }else{
+                        cw.setAlternativeName(null);
+                    }
+                    
+                    //key usage
+                    if(ku.isSelected()){
+                        cw.setKeyUsageIsCritical(kuic.isSelected());
+                        cw.calculateKeyUsage(ds.isSelected(), nr.isSelected(), ke.isSelected(), de.isSelected(), ka.isSelected(), kcs.isSelected(), cs.isSelected(), eo.isSelected(), decO.isSelected());
+                    }else{
+                        cw.setKeyUsageIsCritical(null);
+                    }
+                    
+                    cw.setIsSign(false);
+                    
+                    keys.add(cw);
+                    pocetna(primaryStage);
+                }
+                catch(Exception e){
+                    Logger.getLogger(Generator.class.getName()).log(Level.SEVERE, null, e);
+                }
             }
         });
         GridPane dugmici = new GridPane();
