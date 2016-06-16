@@ -87,13 +87,24 @@ public class StartClass extends Application {
 
     public Label keyUSageIsCritical = new Label("Is Key Usage Critical?");
     public CheckBox kuic = new CheckBox();
-    
+
     public String password;
 
     @Override
     public void start(Stage primaryStage) {
         keys = new ArrayList<>();
         pocetna(primaryStage);
+    }
+
+    private static void configureFileChooser(
+            final FileChooser fileChooser) {
+        fileChooser.setTitle("View Pictures");
+        fileChooser.setInitialDirectory(
+                new File(System.getProperty("user.home"))
+        );
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("P12", "*.p12")
+        );
     }
 
     public void pocetna(Stage primaryStage) {
@@ -111,12 +122,71 @@ public class StartClass extends Application {
         generateMenuItem.setOnAction(actionEvent -> {
             generateKeys(primaryStage);
         });
+        importMenuItem.setOnAction(actionEvent -> {
+
+            fileUtil = new FileUtil();
+            FileChooser fileChooser = new FileChooser();
+            configureFileChooser(fileChooser);
+            File file = fileChooser.showOpenDialog(primaryStage);
+            if (file != null) {
+                Dialog<String> dialog = new Dialog<>();
+                dialog.setTitle("Type password");
+
+                ButtonType next = new ButtonType("Next", ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(next, ButtonType.CANCEL);
+
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+
+                PasswordField pass = new PasswordField();
+                pass.setPromptText("Password");
+
+                grid.add(new Label("Password:"), 0, 1);
+                grid.add(pass, 1, 1);
+
+                Node nextButton = dialog.getDialogPane().lookupButton(next);
+                nextButton.setDisable(true);
+
+                pass.textProperty().addListener((observable, oldValue, newValue) -> {
+                    nextButton.setDisable(newValue.trim().isEmpty());
+                });
+
+                dialog.getDialogPane().setContent(grid);
+
+                Platform.runLater(() -> pass.requestFocus());
+
+                dialog.setResultConverter(dialogButton -> {
+                    if (dialogButton == next) {
+                        password = pass.getText();
+                        return pass.getText();
+                    }
+                    return null;
+                });
+
+                Optional<String> result = dialog.showAndWait();
+
+                result.ifPresent(usernamePassword -> {
+                    CertificateWrapper cw = fileUtil.importKeyStore(file.getPath(), password);
+                    keys.add(cw);
+                    pocetna(primaryStage);
+                });
+            }
+
+        });
         exportMenuItem.setOnAction(actionEvent -> {
             if (selektovani == null) {
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Information Dialog");
                 alert.setHeaderText(null);
                 alert.setContentText("You have to select keypair first!");
+                alert.showAndWait();
+            } else if (selektovani.getCertificate() == null) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Information Dialog");
+                alert.setHeaderText(null);
+                alert.setContentText("You have to sign certificate first!");
                 alert.showAndWait();
             } else {
                 Dialog<String> dialog = new Dialog<>();
@@ -158,7 +228,7 @@ public class StartClass extends Application {
                 Optional<String> result = dialog.showAndWait();
 
                 result.ifPresent(usernamePassword -> {
-                    
+
                     fileUtil = new FileUtil();
                     FileChooser fileChooser = new FileChooser();
 
