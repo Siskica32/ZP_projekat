@@ -421,7 +421,7 @@ public class CertificateWrapper {
             if((usage & KeyUsage.keyEncipherment) > 0) s += "[ Key Encipherment ]";
             if((usage & KeyUsage.dataEncipherment) > 0) s += "[ Data Encipherment ]";
             if((usage & KeyUsage.keyAgreement) > 0) s += "[ Key Agreement ]";
-            if((usage & KeyUsage.keyCertSign) > 0) s += "[ key Certificate Signature ]";
+            if((usage & KeyUsage.keyCertSign) > 0) s += "[ Key Certificate Signature ]";
             if((usage & KeyUsage.cRLSign) > 0) s += "[ Crl Signature ]";
             if((usage & KeyUsage.encipherOnly) > 0) s += "[ Encipher Only ]";
             if((usage & KeyUsage.decipherOnly) > 0) s += "[ Decipher Only ]";
