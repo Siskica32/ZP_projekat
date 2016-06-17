@@ -389,7 +389,7 @@ public class StartClass extends Application {
         TableColumn isSign = new TableColumn("Is Sign");
         isSign.setCellValueFactory(new PropertyValueFactory<CertificateWrapper, String>("isSignString"));
 
-        table.getColumns().addAll(keySize, startDate, expiryDate, serialNumber, commonName, organizationUnitName, organizationName, localityName, stateName, countryName, basicConstraint, alternativeNames, keyUsage, isSign);
+        table.getColumns().addAll(keySize, startDate, expiryDate, serialNumber, commonName, organizationUnitName, organizationName, localityName, stateName, countryName, basicConstraint, alternativeNames, isSign, keyUsage);
         root.setCenter(table);
 
         ObservableList<CertificateWrapper> kljucevi = FXCollections.observableArrayList();
